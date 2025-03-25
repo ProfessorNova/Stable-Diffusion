@@ -67,12 +67,15 @@ def main():
     # Get the shape of one input image
     dummy_input = next(iter(flower_loader))[0][0]
 
-    def train_diffusion_model(model, ema_model, loader, optimizer, device, epochs=50, output_dir="images"):
+    def train_diffusion_model(model, ema_model, loader, optimizer, device, epochs=50, output_dir="output_sd"):
         os.makedirs(output_dir, exist_ok=True)
         criterion = nn.L1Loss()
 
         # Use gradient scaling to prevent underflow
         scaler = torch.amp.GradScaler(str(device))
+
+        best_loss = float("inf")
+        early_stopping_counter = 0
 
         for epoch in range(1, epochs + 1):
             avg_loss = 0.0
@@ -107,21 +110,33 @@ def main():
             print(f"Epoch [{epoch}/{epochs}], Loss: {avg_loss:.4f}, LR: {optimizer.param_groups[0]['lr']}")
             scheduler.step(avg_loss)
 
-            # Sample images and save them as a grid
-            with torch.no_grad():
-                generated_images = generate(ema_model, 8, 50, dummy_input.shape, mean, std, device)
-                torchvision.utils.save_image(
-                    generated_images, f"{output_dir}/generated_images_{epoch}.png", nrow=4
-                )
+            if epoch % 10 == 0:
+                # Sample images and save them as a grid
+                with torch.no_grad():
+                    generated_images = generate(ema_model, 8, 20, dummy_input.shape, mean, std, device)
+                    torchvision.utils.save_image(
+                        generated_images, f"{output_dir}/epoch_{epoch}.png", nrow=4
+                    )
 
-            # Save the model
-            torch.save(ema_model.state_dict(), "diffusion_model.pth")
+            if avg_loss < best_loss:
+                best_loss = avg_loss
+                print(f"Saving model with new best loss: {best_loss:.4f}")
+                torch.save(ema_model.state_dict(), f"{output_dir}/best.pt")
+                early_stopping_counter = 0
+            else:
+                early_stopping_counter += 1
+                if early_stopping_counter >= 20:
+                    print("Early stopping")
+                    break
+
+            # Save the last model
+            torch.save(ema_model.state_dict(), f"{output_dir}/last.pt")
 
     # Initialize models, optimizer, and EMA
     model = UNet(
         in_shape=dummy_input.shape,
         out_shape=dummy_input.shape,
-        features=[32, 64, 128, 256, 512],
+        features=[64, 128, 256, 512, 1024],
         embedding_dim=32
     ).to(device)
 
@@ -133,7 +148,7 @@ def main():
     )
 
     # Initialize optimizer and scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4, eps=1e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=10)
 
     # Start training

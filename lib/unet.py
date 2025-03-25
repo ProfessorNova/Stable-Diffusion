@@ -2,6 +2,7 @@ import math
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 def sinusoidal_embedding(x, embedding_dim=32):
@@ -86,6 +87,14 @@ class UpBlock(nn.Module):
 
         for block in self.residual_blocks:
             skip = skips.pop()  # Last skip connection
+
+            # Padding if the spatial dimensions do not match
+            if x.shape[-2:] != skip.shape[-2:]:
+                diff_y = skip.shape[-2] - x.shape[-2]
+                diff_x = skip.shape[-1] - x.shape[-1]
+                x = F.pad(x, [diff_x // 2, diff_x - diff_x // 2,
+                              diff_y // 2, diff_y - diff_y // 2])
+
             x = torch.cat([x, skip], dim=1)  # Concatenate the skip connection
             x = block(x)
 
@@ -156,4 +165,3 @@ class UNet(nn.Module):
         x = self.out_conv(x)
 
         return x
-

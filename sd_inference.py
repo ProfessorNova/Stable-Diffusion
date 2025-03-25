@@ -21,7 +21,7 @@ def main():
     model = UNet(
         in_shape=image_shape,
         out_shape=image_shape,
-        features=[32, 64, 128, 256, 512],
+        features=[64, 128, 256, 512, 1024],
         embedding_dim=32
     ).to(device)
     ema_model = AveragedModel(
@@ -29,7 +29,7 @@ def main():
         multi_avg_fn=torch.optim.swa_utils.get_ema_multi_avg_fn(0.999),
         device=device
     )
-    checkpoint_path = "diffusion_model_pretrained.pth"
+    checkpoint_path = "model.pt"
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint not found at '{checkpoint_path}'")
 
