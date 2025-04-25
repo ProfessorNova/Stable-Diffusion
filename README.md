@@ -19,32 +19,31 @@ It can be seen that the model is able to generate realistic looking flowers (and
 To get started with this project, follow these steps:
 
 1. **Clone this repository**:
-    ```bash
-    git clone https://github.com/ProfessorNova/Stable-Diffusion-Flowers.git
-    cd Stable-Diffusion-Flowers
-    ```
+
+   ```bash
+   git clone https://github.com/ProfessorNova/Stable-Diffusion-Flowers.git
+   cd Stable-Diffusion-Flowers
+   ```
 
 2. **Set up Python Environment**:
    Make sure you have Python installed (tested with Python 3.10.11).
 
 3. **Install PyTorch**:
-   Visit the [PyTorch website](https://pytorch.org/get-started/locally/) for proper PyTorch installation based on your
-   system configuration.
+   Visit the [PyTorch website](https://pytorch.org/get-started/locally/) for proper PyTorch installation based on your system configuration.
 
 4. **Install Additional Dependencies**:
-   There are two additional dependencies required for this project. `tqdm` is used for progress bars and `matplotlib`
-   is used for plotting the results during inference.
+   There are two additional dependencies required for this project. `tqdm` is used for progress bars and `matplotlib` is used for plotting the results during inference.
 
-    ```bash
-    pip install tqdm matplotlib
-    ```
+   ```bash
+   pip install tqdm matplotlib
+   ```
 
 5. **Run the Pretrained Model**:
    To generate images using the pretrained model, run the following command:
 
-    ```bash
-    python sd_inference.py
-    ```
+   ```bash
+   python sd_inference.py
+   ```
 
    This will generate 8 images and plot them using matplotlib.
 
@@ -58,8 +57,7 @@ To train the model from scratch, run the following command:
 python sd_train.py
 ```
 
-This will start the training process. The model will generate samples after every epoch and save them in the `output_sd`
-folder by default.
+This will start the training process. The model will generate samples after every epoch and save them in the `output_sd` folder by default.
 
 Here are some images generated during training:
 
@@ -68,6 +66,7 @@ Here are some images generated during training:
   ![Epoch 1](docs/epoch_1.png)
 
   It is just pure noise at this point.
+
 - **Epoch 10**:
 
   ![Epoch 10](docs/epoch_10.png)
@@ -102,5 +101,4 @@ Here are some images generated during training:
 
 ## Acknowledgements
 
-This project was highly inspired by
-the keras example [Denoising Diffusion Implicit Models](https://keras.io/examples/generative/ddim/) by András Béres.
+This project was highly inspired by the keras example [Denoising Diffusion Implicit Models](https://keras.io/examples/generative/ddim/) by András Béres.
