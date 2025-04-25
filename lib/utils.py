@@ -2,6 +2,17 @@ import torch
 from tqdm import tqdm
 
 
+def normalize(tensor, mean=None, std=None):
+    if mean is None:
+        mean = [0.4750, 0.3940, 0.3079]
+    if std is None:
+        std = [0.2218, 0.2075, 0.2036]
+    mean = torch.tensor(mean).view(1, -1, 1, 1).to(tensor.device)
+    std = torch.tensor(std).view(1, -1, 1, 1).to(tensor.device)
+    tensor = (tensor - mean) / std
+    return tensor
+
+
 def denormalize(tensor, mean=None, std=None):
     if mean is None:
         mean = [0.4750, 0.3940, 0.3079]

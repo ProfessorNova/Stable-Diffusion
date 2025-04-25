@@ -61,7 +61,6 @@ def main():
         shuffle=True,
         num_workers=4,  # Adjust based on the number of CPU cores
         pin_memory=True if str(device) == "cuda" else False,  # Copy data to CUDA pinned memory
-        prefetch_factor=2,  # Number of batches loaded in advance by each worker
         persistent_workers=True  # Keep workers alive between epochs
     )
     # Get the shape of one input image
@@ -77,10 +76,10 @@ def main():
         best_loss = float("inf")
         early_stopping_counter = 0
 
-        for epoch in range(1, epochs + 1):
+        for epoch in range(epochs):
             avg_loss = 0.0
             model.train()
-            for images, _ in tqdm(loader, desc=f"Epoch {epoch}/{epochs}"):
+            for images, _ in tqdm(loader, desc=f"Epoch {epoch}"):
                 images = images.to(device, non_blocking=True)
                 noises = torch.randn(images.shape, device=device)
 
@@ -107,7 +106,7 @@ def main():
                 avg_loss += loss.item()
 
             avg_loss /= len(loader)
-            print(f"Epoch [{epoch}/{epochs}], Loss: {avg_loss:.4f}, LR: {optimizer.param_groups[0]['lr']}")
+            print(f"Epoch {epoch}, Loss: {avg_loss:.4f}, LR: {optimizer.param_groups[0]['lr']}")
             scheduler.step(avg_loss)
 
             if epoch % 10 == 0:
@@ -125,7 +124,7 @@ def main():
                 early_stopping_counter = 0
             else:
                 early_stopping_counter += 1
-                if early_stopping_counter >= 20:
+                if early_stopping_counter >= 100:
                     print("Early stopping")
                     break
 
@@ -137,7 +136,7 @@ def main():
         in_shape=dummy_input.shape,
         out_shape=dummy_input.shape,
         features=[64, 128, 256, 512, 1024],
-        embedding_dim=32
+        embedding_dim=64,
     ).to(device)
 
     # Use EMA for model so that the model is more robust to noise
@@ -148,11 +147,11 @@ def main():
     )
 
     # Initialize optimizer and scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4, eps=1e-5)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=10)
+    optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=20, factor=0.5, min_lr=1e-6)
 
     # Start training
-    train_diffusion_model(model, ema_model, flower_loader, optimizer, device, epochs=1000)
+    train_diffusion_model(model, ema_model, flower_loader, optimizer, device, epochs=500)
 
 
 if __name__ == "__main__":

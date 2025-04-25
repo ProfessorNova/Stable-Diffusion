@@ -22,13 +22,14 @@ def main():
         in_shape=image_shape,
         out_shape=image_shape,
         features=[64, 128, 256, 512, 1024],
-        embedding_dim=32
+        embedding_dim=64
     ).to(device)
     ema_model = AveragedModel(
         model,
         multi_avg_fn=torch.optim.swa_utils.get_ema_multi_avg_fn(0.999),
         device=device
     )
+    print(ema_model)
     checkpoint_path = "model.pt"
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint not found at '{checkpoint_path}'")

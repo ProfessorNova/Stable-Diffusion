@@ -102,10 +102,10 @@ class UpBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, in_shape, out_shape, features=None, embedding_dim=32):
+    def __init__(self, in_shape, out_shape, features=None, embedding_dim=64):
         super().__init__()
         if features is None:
-            features = [32, 64, 96, 128]
+            features = [64, 128, 256, 512, 1024]
         self.in_shape = in_shape
         self.out_shape = out_shape
         self.features = features
