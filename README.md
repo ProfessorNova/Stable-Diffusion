@@ -1,4 +1,4 @@
-# Stable-Diffusion-Flowers
+# Stable-Diffusion
 
 This repository contains an implementation of the Stable Diffusion model for image generation.
 It is trained on the Flowers102 dataset. Everything is implemented from scratch using PyTorch.
@@ -21,8 +21,8 @@ To get started with this project, follow these steps:
 1. **Clone this repository**:
 
    ```bash
-   git clone https://github.com/ProfessorNova/Stable-Diffusion-Flowers.git
-   cd Stable-Diffusion-Flowers
+   git clone https://github.com/ProfessorNova/Stable-Diffusion.git
+   cd Stable-Diffusion
    ```
 
 2. **Set up Python Environment**:
